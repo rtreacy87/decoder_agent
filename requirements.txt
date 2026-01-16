@@ -1,0 +1,8 @@
+# Project dependencies for CTF Decoder Agent
+
+# No external dependencies required for core functionality
+# Python 3.7+ standard library is sufficient
+
+# Optional dependencies for future enhancements:
+# smolagents>=0.1.0  # For LLM-powered agent (Wiki 2)
+# ollama>=0.1.0      # For local LLM integration (Wiki 2)
