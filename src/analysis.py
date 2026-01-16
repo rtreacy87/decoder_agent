@@ -242,9 +242,111 @@ def identify_likely_encoding(analysis: TextAnalysis) -> Dict[str, float]:
     return confidence
 
 
+# Validation registry pattern
+def _validator_no_change(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if decoding produced no change."""
+    if original == analysis.text:
+        return {
+            "status": "FAILED",
+            "reason": "No change after decoding",
+            "confidence": 0.0
+        }
+    return None
+
+
+def _validator_flag(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if flag format detected."""
+    if analysis.contains_flag:
+        return {
+            "status": "COMPLETE",
+            "reason": "Flag format detected",
+            "confidence": 0.99
+        }
+    return None
+
+
+def _validator_url(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if URL detected."""
+    if analysis.contains_url:
+        return {
+            "status": "COMPLETE",
+            "reason": "URL detected",
+            "confidence": 0.85
+        }
+    return None
+
+
+def _validator_hash(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if hash format detected."""
+    if analysis.hash_type:
+        return {
+            "status": "COMPLETE",
+            "reason": f"{analysis.hash_type} hash detected",
+            "confidence": 0.80
+        }
+    return None
+
+
+def _validator_natural_language(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if text appears to be natural language."""
+    if analysis.printable_ratio > 0.95 and analysis.entropy < 4.5:
+        return {
+            "status": "COMPLETE",
+            "reason": "Natural language detected (high printable ratio, low entropy)",
+            "confidence": 0.90
+        }
+    return None
+
+
+def _validator_still_encoded(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if text still appears encoded."""
+    if analysis.printable_ratio < 0.80 or analysis.entropy > 5.5:
+        return {
+            "status": "PARTIAL",
+            "reason": f"Still appears encoded (printable={analysis.printable_ratio:.2f}, entropy={analysis.entropy:.2f})",
+            "confidence": 0.60
+        }
+    return None
+
+
+def _validator_improved_readability(original: str, analysis: TextAnalysis) -> Optional[Dict]:
+    """Validator: Check if readability improved but still ambiguous."""
+    if analysis.printable_ratio > 0.80:
+        return {
+            "status": "PARTIAL",
+            "reason": "Improved readability but still ambiguous",
+            "confidence": 0.50
+        }
+    return None
+
+
+def _validator_default(original: str, analysis: TextAnalysis) -> Dict:
+    """Fallback validator when no other rules match."""
+    return {
+        "status": "PARTIAL",
+        "reason": "Ambiguous result",
+        "confidence": 0.45
+    }
+
+
+# Registry of validators in priority order
+VALIDATION_REGISTRY = [
+    _validator_no_change,
+    _validator_flag,
+    _validator_url,
+    _validator_hash,
+    _validator_natural_language,
+    _validator_still_encoded,
+    _validator_improved_readability,
+]
+
+
 def validate_decoded_result(original: str, decoded: str) -> Dict:
     """
-    Comprehensive validation of a decoded result.
+    Comprehensive validation of a decoded result using a registry pattern.
+    
+    Validators are checked in priority order. The first validator that
+    returns a non-None result is used.
     
     Args:
         original: The original encoded text
@@ -255,73 +357,20 @@ def validate_decoded_result(original: str, decoded: str) -> Dict:
         {
             "status": "COMPLETE" | "PARTIAL" | "FAILED",
             "reason": str,
-            "confidence": float,
-            "metrics": { analysis results }
+            "confidence": float
         }
     """
-    # No change = failed
-    if original == decoded:
-        return {
-            "status": "FAILED",
-            "reason": "No change after decoding",
-            "confidence": 0.0
-        }
-    
     # Analyze the decoded result
     analysis = analyze_encoding_characteristics(decoded)
     
-    # Check for definitive success patterns
-    if analysis.contains_flag:
-        return {
-            "status": "COMPLETE",
-            "reason": "Flag format detected",
-            "confidence": 0.99
-        }
+    # Run validators in priority order
+    for validator in VALIDATION_REGISTRY:
+        result = validator(original, analysis)
+        if result is not None:
+            return result
     
-    if analysis.contains_url:
-        return {
-            "status": "COMPLETE",
-            "reason": "URL detected",
-            "confidence": 0.85
-        }
-    
-    if analysis.hash_type:
-        return {
-            "status": "COMPLETE",
-            "reason": f"{analysis.hash_type} hash detected",
-            "confidence": 0.80
-        }
-    
-    # Check if it looks like natural text
-    if analysis.printable_ratio > 0.95 and analysis.entropy < 4.5:
-        return {
-            "status": "COMPLETE",
-            "reason": "Natural language detected (high printable ratio, low entropy)",
-            "confidence": 0.90
-        }
-    
-    # Still looks encoded
-    if analysis.printable_ratio < 0.80 or analysis.entropy > 5.5:
-        return {
-            "status": "PARTIAL",
-            "reason": f"Still appears encoded (printable={analysis.printable_ratio:.2f}, entropy={analysis.entropy:.2f})",
-            "confidence": 0.60
-        }
-    
-    # Improved but ambiguous
-    if analysis.printable_ratio > 0.80:
-        return {
-            "status": "PARTIAL",
-            "reason": "Improved readability but still ambiguous",
-            "confidence": 0.50
-        }
-    
-    # Default to partial
-    return {
-        "status": "PARTIAL",
-        "reason": "Ambiguous result",
-        "confidence": 0.45
-    }
+    # Fallback (should rarely reach here)
+    return _validator_default(original, analysis)
 
 
 def print_analysis(text: str) -> None:
