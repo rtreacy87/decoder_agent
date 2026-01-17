@@ -220,7 +220,7 @@ class DecoderAgent:
         
         # Initialize state
         state = DecoderState(
-            initial_text=encoded_text,
+            current_text=encoded_text,
             original_text=encoded_text,
             max_iterations=self.max_iterations
         )

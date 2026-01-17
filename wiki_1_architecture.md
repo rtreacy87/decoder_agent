@@ -1284,16 +1284,77 @@ class DecoderState:
 
 Before moving to Wiki 2 (Development Environment), confirm:
 
-- [ ] I understand why nested encodings are challenging
-- [ ] I can explain the five-step iterative workflow
-- [ ] I know what state variables need to be tracked
-- [ ] I understand all validation metrics and their thresholds
-- [ ] I can justify the max iterations limit
-- [ ] I understand when to stop decoding (4+ stop conditions)
-- [ ] I know the difference between Python-controlled and Agent-controlled loops
-- [ ] I have created all 6 deliverables listed above
-- [ ] My diagrams clearly show the iterative loop structure
-- [ ] My pseudocode is detailed enough to begin coding from
+- [x] **I understand why nested encodings are challenging**
+  - You don't know ahead of time how many layers of encoding are present or what types they are
+  - Simple sequential testing fails because it stops after one decode
+  - Each layer must be identified and decoded iteratively until the original text is recovered
+
+- [x] **I can explain the five-step iterative workflow**
+  1. **Analyze** text characteristics (entropy, charset, padding, length patterns)
+  2. **Identify** most likely encoding based on confidence scores
+  3. **Decode** using the selected decoder tool (base64, hex, rot13, url)
+  4. **Validate** the result (COMPLETE, PARTIAL, or FAILED status)
+  5. **Decision** point: continue loop, stop on success, or stop on failure/max iterations
+
+- [x] **I know what state variables need to be tracked**
+  - `current_text`: The text at the current iteration
+  - `original_text`: The initial input for reference
+  - `encoding_chain`: List of decoders applied (e.g., ["base64", "hex", "rot13"])
+  - `text_history`: All intermediate results for loop detection
+  - `iteration_count`: Current iteration number
+  - `max_iterations`: Safety limit (default: 10)
+  - `confidence_scores`: Confidence level for each decode operation
+  - `is_complete`: Whether decoding finished successfully
+  - `completion_reason`: Why the decoding stopped
+
+- [x] **I understand all validation metrics and their thresholds**
+  - **Printable Ratio**: >0.95 = plain text, 0.80-0.95 = mixed, <0.80 = still encoded
+  - **Entropy**: <4.5 = natural language, 4.5-5.5 = ambiguous, >5.5 = encoded/random
+  - **Flag Pattern**: Regex match for flag{}, HTB{}, CTF{}, etc. = COMPLETE
+  - **URL Pattern**: Contains http:// or https:// = COMPLETE
+  - **Hash Pattern**: 32/40/64 hex chars = MD5/SHA1/SHA256 = COMPLETE
+  - **No Change**: decoded == original = FAILED
+
+- [x] **I can justify the max iterations limit**
+  - Default of 10 iterations provides safety margin since most CTF challenges use 2-4 layers
+  - Prevents infinite loops and resource exhaustion
+  - Configurable for specific use cases (simple challenges can use 5, complex can use 15)
+  - At a certain point, continuing to iterate on garbage data is not productive
+
+- [x] **I understand when to stop decoding (stop conditions)**
+  1. **Flag detected**: Highest priority - found what we're looking for
+  2. **Natural text detected**: High printable ratio (>0.95) and low entropy (<4.5)
+  3. **Max iterations reached**: Safety limit hit
+  4. **Loop detected**: Same result appearing in history
+  5. **No progress**: Decoder failed or produced no change
+  6. **URL/Hash detected**: Recognized complete patterns
+
+- [x] **I know the difference between Python-controlled and Agent-controlled loops**
+  - **Python-controlled** (implemented): Python code manages the loop, state, and validation
+    - Pros: Predictable, easier to debug, guaranteed loop detection
+    - Cons: Less agent autonomy, more code to write
+  - **Agent-controlled**: LLM agent manages entire workflow internally
+    - Pros: More flexible reasoning, simpler code
+    - Cons: Less predictable, harder to debug, may not follow exact workflow
+
+- [x] **I have created all 6 deliverables listed above**
+  1. ✅ High-Level Architecture Diagram (Section 6)
+  2. ✅ Detailed Workflow Flowchart (Section 7)
+  3. ✅ Pseudocode for Main Loop (Section 8) - Implemented in `src/agent.py`
+  4. ✅ Validation Criteria Document (Section 9) - Implemented in `src/analysis.py`
+  5. ✅ State Management Design (Section 3) - Implemented in `src/state.py`
+  6. ✅ Architecture Decision Record (Section 5)
+
+- [x] **My diagrams clearly show the iterative loop structure**
+  - Architecture diagram in Section 6 shows all components and data flow
+  - Flowchart in Section 7 shows decision points and loop-back paths
+  - Loop detection and iteration limits clearly visible
+
+- [x] **My pseudocode is detailed enough to begin coding from**
+  - Full working implementation created in `src/` directory
+  - All core modules implemented: `state.py`, `decoders.py`, `analysis.py`, `agent.py`
+  - Comprehensive test suite in `tests.py` validates all components
+  - Example usage in `examples.py` demonstrates real-world scenarios
 
 ---
 
