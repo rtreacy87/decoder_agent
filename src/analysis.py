@@ -240,9 +240,21 @@ def identify_likely_encoding(analysis: TextAnalysis) -> Dict[str, float]:
         confidence["url"] = 0.90
     
     return confidence
+    
+# Registry of validators in priority order
+# Use a list to preserve priority (insertion) order and store callables
+VALIDATION_REGISTRY = []
 
+def register_validator(func):
+    """Decorator to register a validator function."""
+    VALIDATION_REGISTRY.append(func)
+    return func
+
+# Keep backward-compatible alias for the misspelled name
+# resigter_validator = register_validator
 
 # Validation registry pattern
+@register_validator
 def _validator_no_change(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if decoding produced no change."""
     if original == analysis.text:
@@ -253,7 +265,7 @@ def _validator_no_change(original: str, analysis: TextAnalysis) -> Optional[Dict
         }
     return None
 
-
+@register_validator
 def _validator_flag(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if flag format detected."""
     if analysis.contains_flag:
@@ -264,7 +276,7 @@ def _validator_flag(original: str, analysis: TextAnalysis) -> Optional[Dict]:
         }
     return None
 
-
+@register_validator
 def _validator_url(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if URL detected."""
     if analysis.contains_url:
@@ -275,7 +287,7 @@ def _validator_url(original: str, analysis: TextAnalysis) -> Optional[Dict]:
         }
     return None
 
-
+@register_validator
 def _validator_hash(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if hash format detected."""
     if analysis.hash_type:
@@ -286,7 +298,7 @@ def _validator_hash(original: str, analysis: TextAnalysis) -> Optional[Dict]:
         }
     return None
 
-
+@register_validator
 def _validator_natural_language(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if text appears to be natural language."""
     if analysis.printable_ratio > 0.95 and analysis.entropy < 4.5:
@@ -297,7 +309,7 @@ def _validator_natural_language(original: str, analysis: TextAnalysis) -> Option
         }
     return None
 
-
+@register_validator
 def _validator_still_encoded(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if text still appears encoded."""
     if analysis.printable_ratio < 0.80 or analysis.entropy > 5.5:
@@ -308,7 +320,7 @@ def _validator_still_encoded(original: str, analysis: TextAnalysis) -> Optional[
         }
     return None
 
-
+@register_validator
 def _validator_improved_readability(original: str, analysis: TextAnalysis) -> Optional[Dict]:
     """Validator: Check if readability improved but still ambiguous."""
     if analysis.printable_ratio > 0.80:
@@ -319,7 +331,7 @@ def _validator_improved_readability(original: str, analysis: TextAnalysis) -> Op
         }
     return None
 
-
+@register_validator
 def _validator_default(original: str, analysis: TextAnalysis) -> Dict:
     """Fallback validator when no other rules match."""
     return {
@@ -327,18 +339,6 @@ def _validator_default(original: str, analysis: TextAnalysis) -> Dict:
         "reason": "Ambiguous result",
         "confidence": 0.45
     }
-
-
-# Registry of validators in priority order
-VALIDATION_REGISTRY = [
-    _validator_no_change,
-    _validator_flag,
-    _validator_url,
-    _validator_hash,
-    _validator_natural_language,
-    _validator_still_encoded,
-    _validator_improved_readability,
-]
 
 
 def validate_decoded_result(original: str, decoded: str) -> Dict:
