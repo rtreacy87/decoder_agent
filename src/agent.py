@@ -249,7 +249,6 @@ class DecoderAgent:
         
         return results
 
-
 def iterative_decode(
     encoded_text: str,
     max_iterations: int = 10,

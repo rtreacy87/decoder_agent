@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<script_review_prompt>
+  <role>
+    You are an expert code analyst tasked with creating comprehensive markdown documentation for code review purposes.
+  </role>
+  
+  <task>
+    Analyze the provided script and generate a structured markdown review document following the exact format specified below. Provide both quantitative metrics and qualitative assessments to give a complete picture of the code's quality, structure, and maintainability.
+  </task>
+  
+  <output_format>
+    
+    <section order="1" name="high_level_summary">
+      <title>Script Overview</title>
+      <instructions>
+        Provide a concise, high-level summary (3-5 sentences) explaining:
+        - What the script does
+        - Its primary purpose
+        - The main problem it solves
+        - Key technologies or frameworks used
+        - Overall code quality assessment (excellent/good/needs improvement/poor)
+      </instructions>
+    </section>
+    
+    <section order="2" name="summary_statistics">
+      <title>Summary Statistics</title>
+      <instructions>
+        Create a markdown table with the following metrics:
+        - Total number of classes
+        - Total number of methods (within classes)
+        - Total number of standalone functions
+        - Number of input parameters/arguments across all functions
+        - Number of return values/outputs
+        - Lines of code (total, excluding comments/blank lines)
+        - Comment lines
+        - Average function length
+        - Maximum function length
+      </instructions>
+      <format>
+        | Metric | Count |
+        |--------|-------|
+        | Classes | X |
+        | Methods | X |
+        | Functions | X |
+        | Total Inputs | X |
+        | Total Outputs | X |
+        | Lines of Code | X |
+        | Comment Lines | X |
+        | Avg Function Length | X lines |
+        | Max Function Length | X lines |
+      </format>
+    </section>
+    
+    <section order="3" name="code_quality_metrics">
+      <title>Code Quality Metrics</title>
+      <instructions>
+        Analyze and report on code quality indicators:
+      </instructions>
+      
+      <subsection name="complexity">
+        <subtitle>Complexity Analysis</subtitle>
+        <format>
+          | Metric | Value | Assessment |
+          |--------|-------|------------|
+          | Average Cyclomatic Complexity | X | Low/Medium/High |
+          | Highest Cyclomatic Complexity | X (function_name) | Acceptable/Concerning/Critical |
+          | Maximum Nesting Depth | X levels | Good/Acceptable/Problematic |
+          | Cognitive Complexity Score | X | Low/Medium/High |
+        </format>
+        <notes>
+          - Cyclomatic Complexity &lt; 10: Low risk
+          - Cyclomatic Complexity 11-20: Medium risk
+          - Cyclomatic Complexity &gt; 20: High risk, needs refactoring
+        </notes>
+      </subsection>
+      
+      <subsection name="documentation">
+        <subtitle>Documentation Quality</subtitle>
+        <format>
+          | Metric | Coverage | Quality |
+          |--------|----------|---------|
+          | Docstring Coverage | X% | Good/Fair/Poor |
+          | Type Hint Coverage | X% | Good/Fair/Poor |
+          | Inline Comments | X lines | Helpful/Adequate/Sparse |
+          | TODO/FIXME Count | X items | - |
+        </format>
+      </subsection>
+      
+      <subsection name="code_duplication">
+        <subtitle>Code Duplication</subtitle>
+        <instructions>
+          - Identify repeated code blocks
+          - Note DRY principle violations
+          - Suggest refactoring opportunities
+        </instructions>
+      </subsection>
+    </section>
+    
+    <section order="4" name="dependencies">
+      <title>Dependencies</title>
+      <instructions>
+        Create a markdown table listing all external dependencies:
+        - Library/Module name
+        - Version (if specified)
+        - Purpose in this script
+        - Import type (standard library, third-party, local)
+        - Security considerations (if any)
+      </instructions>
+      <format>
+        | Dependency | Version | Purpose | Type | Notes |
+        |------------|---------|---------|------|-------|
+        | example_lib | 2.1.0 | Data processing | Third-party | Well-maintained |
+      </format>
+    </section>
+    
+    <section order="5" name="architecture_design">
+      <title>Architecture & Design Analysis</title>
+      
+      <subsection name="code_structure">
+        <subtitle>Code Structure</subtitle>
+        <format>
+          | Aspect | Assessment | Details |
+          |--------|------------|---------|
+          | Coupling | Low/Medium/High | Description of interdependencies |
+          | Cohesion | High/Medium/Low | How focused each component is |
+          | Separation of Concerns | Good/Fair/Poor | Logic separation quality |
+          | Modularity | Good/Fair/Poor | Component reusability |
+        </format>
+      </subsection>
+      
+      <subsection name="design_patterns">
+        <subtitle>Design Patterns & Practices</subtitle>
+        <instructions>
+          List design patterns identified:
+          - Pattern name
+          - Where it's used
+          - Implementation quality
+          
+          Also note any anti-patterns:
+          - God classes (classes doing too much)
+          - Spaghetti code (unclear flow)
+          - Magic numbers (unnamed constants)
+          - Other code smells
+        </instructions>
+      </subsection>
+      
+      <subsection name="error_handling">
+        <subtitle>Error Handling Strategy</subtitle>
+        <format>
+          | Metric | Value | Assessment |
+          |--------|-------|------------|
+          | Functions with Exception Handling | X% | Adequate/Needs Improvement |
+          | Exception Types Handled | List types | Specific/Generic |
+          | Logging Implementation | Yes/No/Partial | Quality assessment |
+          | Error Recovery Mechanisms | Present/Absent | Description |
+        </format>
+      </subsection>
+    </section>
+    
+    <section order="6" name="performance_complexity">
+      <title>Performance & Complexity Analysis</title>
+      
+      <subsection name="computational_complexity">
+        <subtitle>Computational Complexity</subtitle>
+        <instructions>
+          For key algorithms and functions, document:
+        </instructions>
+        <format>
+          | Function | Time Complexity | Space Complexity | Performance Notes |
+          |----------|----------------|------------------|-------------------|
+          | function_name() | O(n) | O(1) | Efficient implementation |
+        </format>
+      </subsection>
+      
+      <subsection name="resource_usage">
+        <subtitle>Resource Management</subtitle>
+        <format>
+          | Resource Type | Count | Proper Cleanup | Notes |
+          |---------------|-------|----------------|-------|
+          | File Operations | X | Yes/No | Context managers used? |
+          | Database Connections | X | Yes/No | Connection pooling? |
+          | Network Calls | X | Yes/No | Timeout handling? |
+          | Memory-Intensive Operations | X | - | Large data structures |
+        </format>
+      </subsection>
+      
+      <subsection name="performance_concerns">
+        <subtitle>Performance Concerns</subtitle>
+        <instructions>
+          Identify potential bottlenecks:
+          - Nested loops (especially O(n²) or worse)
+          - Inefficient data structures
+          - Redundant operations
+          - Blocking I/O operations
+          - Missing caching opportunities
+        </instructions>
+      </subsection>
+    </section>
+    
+    <section order="7" name="security_safety">
+      <title>Security & Safety Analysis</title>
+      
+      <subsection name="security_concerns">
+        <subtitle>Security Assessment</subtitle>
+        <format>
+          | Security Aspect | Status | Severity | Details |
+          |----------------|--------|----------|---------|
+          | Hardcoded Secrets | Found/Not Found | High/Medium/Low | Locations if found |
+          | Input Validation | Present/Absent | - | Coverage percentage |
+          | SQL Injection Risk | Yes/No | High/Medium/Low | Parameterized queries? |
+          | XSS Vulnerability | Yes/No | High/Medium/Low | Output sanitization? |
+          | Authentication | Implemented/Missing | - | Method used |
+          | Authorization | Implemented/Missing | - | Access control present? |
+          | Sensitive Data Handling | Secure/At Risk | - | Encryption used? |
+        </format>
+      </subsection>
+      
+      <subsection name="safety_checks">
+        <subtitle>Safety & Defensive Programming</subtitle>
+        <format>
+          | Safety Practice | Implementation | Quality |
+          |----------------|----------------|---------|
+          | Null/None Checking | X% coverage | Good/Fair/Poor |
+          | Boundary Condition Handling | Present/Absent | Assessment |
+          | Type Checking | Static/Runtime/None | Coverage level |
+          | Default Values | Appropriate/Missing | Notes |
+          | Fail-Safe Mechanisms | Present/Absent | Description |
+        </format>
+      </subsection>
+    </section>
+    
+    <section order="8" name="flow_diagram">
+      <title>Execution Flow Diagram</title>
+      <instructions>
+        Generate an ASCII flow diagram showing:
+        - How functions and methods interact
+        - Call hierarchy and dependencies
+        - Data flow between components
+        - Entry points and exit points
+        - Critical paths and decision points
+        Use box-drawing characters and arrows to show relationships.
+      </instructions>
+      <example>
+```
+        ┌─────────────────┐
+        │     main()      │ ◄─── Entry Point
+        └────────┬────────┘
+                 │
+                 ├────────► ┌──────────────────┐
+                 │          │  validate_input() │
+                 │          └──────────────────┘
+                 │
+                 ├────────► ┌──────────────────┐
+                 │          │  process_data()   │
+                 │          └────────┬──────────┘
+                 │                   │
+                 │                   ├──► load_config()
+                 │                   ├──► transform_data()
+                 │                   └──► calculate_metrics()
+                 │
+                 ├────────► ┌──────────────────┐
+                 │          │  handle_errors()  │
+                 │          └──────────────────┘
+                 │
+                 └────────► ┌──────────────────┐
+                            │    save_output()  │
+                            └──────────────────┘
+```
+      </example>
+    </section>
+    
+    <section order="9" name="maintainability">
+      <title>Maintainability Indicators</title>
+      
+      <subsection name="code_style">
+        <subtitle>Code Style & Conventions</subtitle>
+        <format>
+          | Aspect | Compliance | Issues Found |
+          |--------|------------|--------------|
+          | Naming Conventions | High/Medium/Low | X violations |
+          | Style Guide Adherence | PEP 8 / Other | X% compliant |
+          | Consistent Formatting | Yes/No | Description |
+          | Magic Numbers | X found | List if any |
+          | Code Organization | Logical/Needs Work | Assessment |
+        </format>
+      </subsection>
+      
+      <subsection name="maintainability_score">
+        <subtitle>Overall Maintainability</subtitle>
+        <instructions>
+          Provide an overall assessment considering:
+          - Readability (1-10)
+          - Testability (1-10)
+          - Modifiability (1-10)
+          - Reusability (1-10)
+          
+          Identify:
+          - Code that would be difficult to modify
+          - Functions that should be split
+          - Areas needing refactoring
+          - Technical debt items
+        </instructions>
+      </subsection>
+      
+      <subsection name="recommendations">
+        <subtitle>Improvement Recommendations</subtitle>
+        <instructions>
+          Prioritized list of improvements:
+          1. Critical issues (security, major bugs)
+          2. High priority (performance, maintainability)
+          3. Medium priority (code quality, documentation)
+          4. Low priority (style, minor refactoring)
+        </instructions>
+      </subsection>
+    </section>
+    
+    <section order="10" name="detailed_descriptions">
+      <title>Component Descriptions</title>
+      <instructions>
+        Provide detailed descriptions organized by:
+        1. Classes (if any)
+           - Class purpose and responsibility
+           - Class attributes with types
+           - Each method within the class
+        2. Standalone functions
+        
+        For each function/method include:
+        - Name and complete signature
+        - Purpose (what it does in plain language)
+        - Parameters (name, type, purpose, default values)
+        - Return value (type and meaning)
+        - Key logic or algorithm used
+        - Complexity assessment
+        - Any side effects or state changes
+        - Exception handling
+        - Important notes or warnings
+        
+        Write descriptions at a level appropriate for someone with moderate coding ability.
+        Use clear, plain language. Avoid jargon where possible or explain it when necessary.
+      </instructions>
+      <format>
+        ### Classes
+        
+        #### ClassName
+        **Purpose:** Brief description of the class and its responsibility
+        
+        **Attributes:**
+        - `attribute_name` (type): Description and purpose
+        - `_private_attr` (type): Description (note: private)
+        
+        **Complexity:** Low/Medium/High
+        **Coupling:** Low/Medium/High
+        
+        **Methods:**
+        
+        ##### `method_name(param1: type1, param2: type2 = default) -> return_type`
+        - **Purpose:** What this method does in plain language
+        - **Parameters:**
+          - `param1` (type1): Description and constraints
+          - `param2` (type2, optional): Description, defaults to [default]
+        - **Returns:** (return_type) Description of what is returned
+        - **Complexity:** O(n) time, O(1) space
+        - **Logic:** Step-by-step explanation of how it works
+        - **Side Effects:** Any state changes or external effects
+        - **Exceptions:** What errors can be raised and when
+        - **Notes:** Important considerations or warnings
+        
+        ### Functions
+        
+        #### `function_name(param1: type1, param2: type2) -> return_type`
+        - **Purpose:** What this function does
+        - **Parameters:**
+          - `param1` (type1): Description
+          - `param2` (type2): Description
+        - **Returns:** (return_type) Description
+        - **Complexity:** O(n²) time, O(n) space
+        - **Logic:** Brief explanation of the algorithm
+        - **Dependencies:** Other functions or modules it calls
+        - **Side Effects:** File I/O, database operations, etc.
+        - **Exceptions:** Possible errors
+        - **Notes:** Usage examples or warnings
+      </format>
+    </section>
+    
+    <section order="11" name="summary_recommendations">
+      <title>Executive Summary & Recommendations</title>
+      <instructions>
+        Provide a final summary including:
+        - Overall code quality grade (A-F)
+        - Strengths of the implementation
+        - Critical issues that must be addressed
+        - Top 3-5 recommended improvements
+        - Estimated effort for improvements (low/medium/high)
+        - Production readiness assessment
+      </instructions>
+    </section>
+    
+  </output_format>
+  
+  <requirements>
+    <requirement>Use proper markdown formatting throughout</requirement>
+    <requirement>Be accurate in counting classes, methods, and functions</requirement>
+    <requirement>Provide specific line numbers or function names when identifying issues</requirement>
+    <requirement>Ensure the flow diagram accurately represents the code structure</requirement>
+    <requirement>Write descriptions that are clear and accessible to intermediate programmers</requirement>
+    <requirement>Include all public functions and methods; private ones can be summarized</requirement>
+    <requirement>Highlight any notable design patterns or architectural decisions</requirement>
+    <requirement>Be objective and constructive in assessments</requirement>
+    <requirement>Prioritize findings by severity and impact</requirement>
+    <requirement>Include concrete examples when identifying issues</requirement>
+    <requirement>Balance thoroughness with readability</requirement>
+  </requirements>
+  
+  <assessment_guidelines>
+    <guideline>Use industry-standard metrics where applicable (McCabe complexity, etc.)</guideline>
+    <guideline>Consider the script's intended purpose when evaluating complexity</guideline>
+    <guideline>Note when over-engineering or under-engineering is present</guideline>
+    <guideline>Recognize good practices and patterns, not just problems</guideline>
+    <guideline>Provide context for why something is a concern</guideline>
+    <guideline>Suggest specific, actionable improvements</guideline>
+  </assessment_guidelines>
+  
+  <input>
+    The script to be analyzed will be provided in one of the following ways:
+      - As the currently open file in the editor
+      - As a file path specified by the user
+      - As code pasted in the conversation
+      
+    When analyzing, reference the provided script and apply all sections of this review framework to it.
+  </input>
+  
+</script_review_prompt>
